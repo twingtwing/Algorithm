@@ -86,7 +86,7 @@ class SLApply{
     // 노드 값 호출
     int kthToLast(Node n, int k){
         if (n==null){
-            return 0;
+            return 0; // 재귀호출 end 지점
         }
 
         int count = kthToLast(n.next, k) + 1; // 재귀 호출
@@ -97,13 +97,13 @@ class SLApply{
     }
 
     //노드 호출
-    class Reference{
+    class Reference{ //영상에서는 private static으로 함
         public int count;
     }
 
     Node kthToLast(Node n, int k, Reference r){
         if (n == null){
-            return null;
+            return null; // 재귀호출 end 지점
         }
 
         Node found = kthToLast(n.next, k,  r); // 재귀 호출
