@@ -3,7 +3,7 @@ package Stack_Queue;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
-/**
+/**d
  * 1. 웅용 Stack 가장 작은 값을 반환하는 함수 구현 (단, 0[1] 의 시간만 걸려야한다.) => 한번 도는데도 0[n]의 시간이 걸린다.
  */
 // 방법 1 : Node에 변수 공간을 한개 더 생성

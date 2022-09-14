@@ -194,7 +194,7 @@ class Stack_Hard{
         }
         values[stack.getNewDataIndex()] = value;
         stack.dataSize ++;
-    }
+    } 
 
     public int pop(int stackNum) throws Exception{
         StackInfo stack = info[stackNum];

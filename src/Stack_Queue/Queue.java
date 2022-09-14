@@ -13,7 +13,7 @@ class QueueTest<T>{
     private Node<T> last;  //가장 최근에 넣은게 끝으로 와야한다. 그렇기에 last는 next값이 존재하지 않음
 
     class Node<T>{
-        private T data;
+        private T  data;
         private Node<T> next = null;
 
         public Node(T data){
@@ -64,6 +64,7 @@ public class Queue {
         q.add(2);
         q.add(3);
         q.add(4);
+        q.add(5);
         System.out.println(q.remove());
         System.out.println(q.remove());
         System.out.println(q.peek());

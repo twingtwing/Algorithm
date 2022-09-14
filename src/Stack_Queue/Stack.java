@@ -59,6 +59,7 @@ public class Stack {
         s.push(2);
         s.push(3);
         s.push(4);
+        s.push(5);
         System.out.println(s.pop());
         System.out.println(s.pop());
         System.out.println(s.peek());
