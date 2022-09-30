@@ -1,4 +1,7 @@
 package Trees_Graphs;
+
+import java.util.Random;
+
 /**
  * 응용 : 이진 검색트리에서 임의의 노드를 가져오는 알고리즘을 구현
  *       단, 모든 노드에 동일한 확률로 임의의 노들르 가져와야 하며, 필요한 경우 노드에 추가 정보를 저장하여도 가능
@@ -10,20 +13,94 @@ package Trees_Graphs;
 class Tree5{
     class Node{
         int data;
-        int count;
+        int size = 0;
         Node left;
         Node right;
         Node(int data){
             this.data = data;
+            this.size = 1;
+        }
+
+        // tree node insert
+        void insert(int data){
+            // 이진 검색 트리 이기 때문
+            if (data <= this.data){
+                if (left == null){
+                    left = new Node(data);
+                }else{
+                    left.insert(data); //왼쪽으로 재귀호출
+                }
+            }else{
+                if (right == null){
+                    right = new Node(data);
+                }else{
+                    right.insert(data); //오른쪽으로 재귀호출
+                }
+            }
+            size ++;
+        }
+
+        int size(){return size;}
+
+        Node find(int data){
+            if (data == this.data){
+                return this;
+            }else if (data < this.data){
+                return left != null? left.find(data) : null;
+            }else if (data > this.data){
+                return right != null? right.find(data) : null;
+            }else{
+                return null;
+            }
+        }
+
+        // Random으로 찾을 index
+        Node getItNode(int i){
+            int leftSize = left == null ? 0 : left.size();
+            if (i < leftSize){
+                return left.getItNode(i);
+            }else if(i == leftSize){
+                return this;
+            }else{
+                return right.getItNode(i - (leftSize + 1)); // left + root 갯수 만큼 빼줌
+            }
         }
     }
 
     Node root;
 
+    int size(){
+        return root == null? 0 : root.size();
+    }
+
+    void insert(int data){
+        if (root == null) root = new Node(data);
+        else root.insert(data);
+    }
+
+    // 임의 노드를 가져오는 Random 함수
+    Node getRandomNode(){
+        if (root == null) return null;
+        Random random = new Random();
+        int i = random.nextInt(size()); // 전체 노드갯수를 넘어가지 못하도록 한정함
+        return root.getItNode(i);
+    }
+
 }
 
 public class TreeApply8 {
     public static void main(String[] args) {
-
+        Tree5 tree = new Tree5();
+        tree.insert(4);
+        tree.insert(0);
+        tree.insert(1);
+        tree.insert(2);
+        tree.insert(5);
+        tree.insert(7);
+        tree.insert(8);
+        tree.insert(3);
+        tree.insert(6);
+        tree.insert(9);
+        System.out.println(tree.getRandomNode().data);
     }
 }
