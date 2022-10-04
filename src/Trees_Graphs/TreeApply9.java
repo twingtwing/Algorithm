@@ -1,6 +1,7 @@
 package Trees_Graphs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -11,7 +12,9 @@ import java.util.LinkedList;
  *       => 그러나 만약에 이러면 모든 노드에서의 경로를 모두 알아야 하므로 시간 복잡도가 O(nlogn)에서 O(m^2)이 걸림
  *       => 이렇게 되면, 중복 검색 또한 일어남 그렇기에 추가공간을 이용하여 중복 순회를 막는다. (추가공간 : 배열\)
  *          시간복잡도 O(nd) d = level을 가짐
- *       =>
+ *       => 그러나, 이러면 값 계산이 복잡해 지기 때문에, 노드값을 배열간 거리롤 설정...????
+ *          값이 추가되면, 그만큼 거리를 설정 여기서 랜덤값만큼 뒤로가서 노드를 만나면 그만 큼 경우의 수가 생김
+ *          이때는 배열 대신, HashMap을 사용함
  */
 class Tree6{
     class Node{
@@ -102,6 +105,33 @@ class Tree6{
         return totalPaths;
     }
 
+    int countPathsWithSum3(int targetSum){
+        HashMap<Integer, Integer> hashTable = new HashMap<>();
+        hashTable.put(0,1); // node값을 key값으로 생각
+        return countPathsWithSum3(root,targetSum,0,hashTable);
+    }
+
+    int countPathsWithSum3(Node node,int targetSum, int currSum, HashMap<Integer,Integer> hashTable){
+        if (node == null) return 0;
+
+        currSum += node.data;
+        int sum= currSum - targetSum;
+        int toatalPaths = hashTable.getOrDefault(sum,0);
+        incrementHashTable(hashTable,currSum,1); // hashmap 현재 합산값 key값으로 추가
+        toatalPaths += countPathsWithSum3(node.left, targetSum, currSum, hashTable);
+        toatalPaths += countPathsWithSum3(node.right, targetSum, currSum, hashTable);
+        incrementHashTable(hashTable,currSum,-1); // hashmap 에서 해당 node에 대한 값을 remove
+        return toatalPaths;
+    }
+
+    void incrementHashTable(HashMap<Integer,Integer> hashTable, int key, int val){
+        int newCount = hashTable.getOrDefault(key,0) + val;
+        if (newCount == 0){
+            hashTable.remove(key); // 0이면 해당 키값을 사용하지 않는다는 의미 이므로 삭제함
+        }else{
+            hashTable.put(key,newCount); // 없으면 추가 있으면 수정
+        }
+    }
 
 }
 
@@ -110,5 +140,6 @@ public class TreeApply9 {
         Tree6 tree = new Tree6(10);
         System.out.println(tree.countPathsWithSum(5));
         System.out.println(tree.countPathsWithSum2(5));
+        System.out.println(tree.countPathsWithSum3(5));
     }
 }
