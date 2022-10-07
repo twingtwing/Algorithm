@@ -12,6 +12,7 @@ class ArrayList{
     }
 
     public void add(Object obj){
+        System.out.println("index : "+this.index+", size : "+this.size+", Array size : " + this.ary.length ); //doubling 흔적을 확인할 수 있음
         if (this.index == this.size -1){ // 방이 다 차있는지 확인
             doubling();
         }
@@ -43,9 +44,11 @@ class ArrayList{
         }else if(i<0){
             throw new Exception("Negative Value");
         }
-        for (int j = i; j < ary.length -1; j++){ //한칸씩 앞으로 이동
+        System.out.println("data removed : "+this.ary[i]);
+        for (int j = i; j < this.ary.length -1; j++){ //한칸씩 앞으로 이동
             ary[j] = ary[j+1];
         }
+        this.index--;
     }
 }
 
@@ -62,6 +65,14 @@ public class ArrayLists {
         list.add("7");
         list.add("8");
         list.add("9");
+
+        try {
+            System.out.println(list.get(5));
+            list.remove(5);
+            System.out.println(list.get(5));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
 
     }
