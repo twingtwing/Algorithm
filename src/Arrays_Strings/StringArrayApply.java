@@ -20,7 +20,6 @@ public class StringArrayApply {
         System.out.println(isPermutationOfPalindrorne3("aa bb cc dd"));
         System.out.println(isPermutationOfPalindrorne3("aa bb cc dd e"));
         System.out.println(isPermutationOfPalindrorne3("aa bb cc dd e fff"));
-
     }
 
     // 처음부터 끝까지 돌아야하기에 O(n)의 시간이 걸림
