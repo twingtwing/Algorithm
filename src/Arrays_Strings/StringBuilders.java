@@ -24,15 +24,37 @@ class StringBuilder{
 
     public void append(String str){
         if (str == null) str = "null";
-        int len = str.length();
-//        ensureCapacity(len);
+        int len = str.length(); // 입력하는 문자길이
+        ensureCapacity(len);
         for (int i = 0; i < str.length(); i++){
+            value[index] = str.charAt(i);
+            index++;
         }
+        System.out.println(size +", "+index);
+    }
+
+    private void ensureCapacity(int len){ //배열방의 크기가 부족할경우 확장하는 기능
+        if (index + len > size){ //입력하는 문자길이 + 현재 index까지의 길이 > 배열의 길이 이면 for구문이 끝나기 전에 배열이 부족함을 사전에 알 수 있음
+            size = (size + len) * 2;
+            char[] newAry = new char[size];
+            for (int i = 0; i < value.length; i++){
+                newAry[i] = value[i]; //문자이기 때문에, 데이터가 아닌 포인터를 복사함?
+            }
+            value = newAry;
+        }
+    }
+
+    public String toString(){
+        return new String(value,0,index);
     }
 }
 
 public class StringBuilders {
     public static void main(String[] args) {
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("sung");
+        sb.append(" is");
+        sb.append(" pretty");
+        System.out.println(sb.toString());
     }
 }
