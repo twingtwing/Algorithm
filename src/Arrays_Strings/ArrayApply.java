@@ -38,10 +38,10 @@ public class ArrayApply {
     public static void main(String[] args) {
         int[] nums = {6,4,3,8,7,5,2};
         Solution sol = new Solution();
-        int[] result = sol.twoSum(nums,5);
+        int[] result = sol.twoSum(nums,6);
         System.out.println(result[0] + ", " + result[1]);
 
-        int[] result2 = sol.twoSum2(nums,5);
+        int[] result2 = sol.twoSum2(nums,6);
         System.out.println(result2[0] + ", " + result2[1]);
     }
 }
