@@ -157,52 +157,63 @@ class SinglyLinkedList2{
     // 4. 2개의 partition으로 분리
 
     // 4.1 두개의 list로 만든 후 병합
-    Node partCombine(int x){
-        Node node = this.header.link;
-        Node left = new Node();
-        Node right = new Node();
-        Node leftLast = new Node();;
+    Node partCombine(Node node, int x){
+        Node left = null,right = null,leftLast = null;
 
         while (node != null){
-            if (node.data > x){
-                left.link = node;
-                leftLast = node;
+            Node next = node.link;
+            node.link = null; // 무한 loop를 피하기 위해서 사용
+            if (node.data <= x){
+                if (left == null){
+                    left = node;
+                    leftLast = node;
+                }else{
+                    node.link = left;
+                    left = node;
+                }
             }
-            else
-                right.link = node;
-            node = node.link;
+            else {
+                if (right == null){
+                    right = node;
+                }else{
+                    node.link = right;
+                    right = node;
+                }
+            }
+            node = next;
         }
 
-        if(left.link == null) return right;
+        if(left == null) return right;
 
-        leftLast.link = right.link;
+        leftLast.link = right;
         return left;
 
     }
 
     // 4.2 처음부터 한개의 list에서 병합
-    Node partOne(int x){
-        Node node = this.header.link;
+    Node partOne(Node node, int x){
         Node head = new Node();
         Node tail = null;
 
         while (node != null){
-            if (node.data > x){
+            Node next = node.link;
+            node.link = null;
+            if (node.data <= x){
+                if (head.link == null) tail = node;
                 node.link = head.link;
                 head.link = node;
             }
             else{
                 if (head.link == null){
                     head.link = node;
-                    tail = node;
                 }else{
                     tail.link = node;
-                    tail = node;
                 }
+                tail = node;
             }
-            node = node.link;
+            node = next;
         }
-        return head;
+        return head.link;
     }
 
 }
@@ -240,7 +251,9 @@ public class Singly_Linked_List_Apply {
         ll.deleteNode(ll.get(2));
         ll.retrieve();
 
-        ll.retrieve(ll.partCombine(5));
-        ll.retrieve(ll.partOne(5));
+        System.out.println();
+
+//        ll.retrieve(ll.partCombine(ll.getFirst(),3));
+        ll.retrieve(ll.partOne(ll.getFirst(),3));
     }
 }
