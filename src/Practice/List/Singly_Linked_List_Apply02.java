@@ -1,5 +1,6 @@
 package Practice.List;
 
+import com.sun.org.apache.xpath.internal.objects.XNodeSet;
 import com.sun.xml.internal.bind.marshaller.NoEscapeHandler;
 
 import java.util.Random;
@@ -180,13 +181,81 @@ class SinglyLinkedListApply2{
     }
 
     // 응용 2.1.2
+    Node sumRevRec2(Node first, Node second){
+        if (first == null && second == null) return null;
+        int lenFirst = getListLength(first);
+        int lenSecond = getListLength(second);
+
+        // 두 list 길이를 맞춤
+        if (lenFirst < lenSecond){
+            first = LPadList(first,lenSecond - lenFirst);
+        }else{
+            second = LPadList(second,lenFirst - lenSecond);
+        }
+
+        Storage storage = addLists(first,second);
+        if (storage.up != 0){
+            storage.node = insertBefore(storage.node, storage.up);
+        }
+        return storage.node;
+    }
+
+    int getListLength(Node node){
+        if (node== null) return 0;
+        int count = 0;
+        while (node != null){
+            count ++;
+            node = node.link;
+        }
+        return count;
+    }
+
+    Node LPadList(Node node, int length){
+        if (length == 0) return node;
+        Node result = node;
+        while (length > 0){
+            length--;
+        }   node = insertBefore(node,0);
+        return result;
+    }
+
+    Node insertBefore(Node node, int data){
+        if (node == null) return null;
+        node.link = new Node(data);
+        return node;
+    }
+
+    Storage addLists(Node first, Node second){
+        if (first == null && second == null) return null;
+        int one = 0, two = 0;
+        if (first != null){
+            one = first.data;
+            first = first.link;
+        }
+        if (second != null){
+            two = second.data;
+            second = second.link;
+        }
+        Storage storage = addLists(first, second);
+        int num = one + two;
+        if (storage != null){
+            num = num + storage.up;
+            storage.node = insertBefore(storage.node,num%10);
+        }else{
+            storage = new Storage();
+            storage.node = new Node(num%10);
+        }
+        storage.up = num > 10 ? 1 : 0;
+        return storage;
+    }
+
 
     // 응용 2.2 합계를 구한 뒤에 새로운 LinkedList를 만듦
     void sumListTotal(Node first, Node second){
         if (first == null && second == null) return;
         int one = sumTotal(first);
         int two = sumTotal(second);
-        this.header.link = madeList(one + two);
+        this.header.link = madeListRev(one + two, (int)Math.log10(one + two));
     }
 
     int sumTotal(Node node){
@@ -194,12 +263,12 @@ class SinglyLinkedListApply2{
         return sumTotal(node.link)*10 + node.data;
     }
 
-    Node madeList(int num){
-        if (num == 0) return null;
-        while (num > 0){
-
-        }
-        return null;
+    Node madeListRev(int data,int length){
+        if (length == -1) return null;
+        int num =  data/((int) Math.pow(10,length));
+        Node node = new Node(num);
+        node.link = madeListRev(data%((int) Math.pow(10,length)),--length);
+        return node;
     }
 
     // 응용 2.2.2
@@ -244,6 +313,20 @@ public class Singly_Linked_List_Apply02 {
         list06.sumRevRec(list01.getFirst(),list02.getFirst());
         list06.retrieve();
         list06.retrieveNumRev();
+
+        // 응용 2.1.2
+        SinglyLinkedListApply2 list07 = new SinglyLinkedListApply2();
+        list07.sumRevRec2(list01.getFirst(),list02.getFirst());
+        list07.retrieve();
+        list07.retrieveNumRev();
+
+        System.out.println();
+
+        // 응용 2.2.2 재귀호출 + 저장소
+        SinglyLinkedListApply2 list08 = new SinglyLinkedListApply2();
+        list08.sumListTotal(list01.getFirst(),list02.getFirst());
+        list08.retrieve();
+        list08.retrieveNumRev();
 
     }
 }
