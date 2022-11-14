@@ -1,7 +1,6 @@
-package Practice.List;
+package practice.list;
 
-import com.sun.org.apache.xpath.internal.objects.XNodeSet;
-import com.sun.xml.internal.bind.marshaller.NoEscapeHandler;
+import 엔지니어_대한민국.LinkedList.SinglyLinkedListApply3;
 
 import java.util.Random;
 
@@ -126,7 +125,8 @@ class SinglyLinkedListApply2{
 
     Node sumListRec(Node first, Node second,int up){
         if (first == null && second == null && up == 0) return null;
-        int one = 0, two = 0;
+        int one = 0;
+        int two = 0;
         if (first != null){
             one = first.data;
             first = first.link;
@@ -137,7 +137,7 @@ class SinglyLinkedListApply2{
         }
         int sum = one + two + up;
         Node result = new Node(sum%10);
-        Node node = sumListRec(first,second,sum >= 10 ? 1 : 0);
+        Node node = sumListRec(first,second,sum/10);
         if (node != null){
             result.link = node;
         }
@@ -156,7 +156,8 @@ class SinglyLinkedListApply2{
 
     Node sumRevRec(Node first, Node second, Storage storage){
         if (first == null && second == null && storage.up == 0) return null;
-        int one = 0, two = 0;
+        int one = 0;
+        int two = 0;
         if (first != null){
             one = first.data;
             first = first.link;
@@ -167,7 +168,7 @@ class SinglyLinkedListApply2{
         }
         int sum = one + two + storage.up;
         Node result = new Node(sum%10);
-        storage.up = sum >= 10 ? 1 : 0;
+        storage.up = sum/10;
 
         Node node = sumRevRec(first,second,storage);
         if (storage.node != null){
@@ -181,23 +182,22 @@ class SinglyLinkedListApply2{
     }
 
     // 응용 2.1.2
-    Node sumRevRec2(Node first, Node second){
-        if (first == null && second == null) return null;
+    void sumRevRec2(Node first, Node second){
+        if (first == null && second == null) return;
         int lenFirst = getListLength(first);
         int lenSecond = getListLength(second);
 
-        // 두 list 길이를 맞춤
         if (lenFirst < lenSecond){
-            first = LPadList(first,lenSecond - lenFirst);
+            first = lPadList(first,lenSecond - lenFirst);
         }else{
-            second = LPadList(second,lenFirst - lenSecond);
+            second = lPadList(second,lenFirst - lenSecond);
         }
 
         Storage storage = addLists(first,second);
         if (storage.up != 0){
             storage.node = insertBefore(storage.node, storage.up);
         }
-        return storage.node;
+        this.header.link = storage.node;
     }
 
     int getListLength(Node node){
@@ -210,42 +210,29 @@ class SinglyLinkedListApply2{
         return count;
     }
 
-    Node LPadList(Node node, int length){
+    Node lPadList(Node node, int length){// 두 list 길이를 맞추고
         if (length == 0) return node;
         Node result = node;
         while (length > 0){
             length--;
-        }   node = insertBefore(node,0);
+            node = insertBefore(node,0);
+        }
         return result;
     }
 
     Node insertBefore(Node node, int data){
-        if (node == null) return null;
-        node.link = new Node(data);
-        return node;
+        Node prev = new Node(data);
+        if (node != null)
+            prev.link = node;
+        return prev;
     }
 
     Storage addLists(Node first, Node second){
-        if (first == null && second == null) return null;
-        int one = 0, two = 0;
-        if (first != null){
-            one = first.data;
-            first = first.link;
-        }
-        if (second != null){
-            two = second.data;
-            second = second.link;
-        }
-        Storage storage = addLists(first, second);
-        int num = one + two;
-        if (storage != null){
-            num = num + storage.up;
-            storage.node = insertBefore(storage.node,num%10);
-        }else{
-            storage = new Storage();
-            storage.node = new Node(num%10);
-        }
-        storage.up = num > 10 ? 1 : 0;
+        if (first == null || second == null) return new Storage();
+        Storage storage = addLists(first.link,second.link);
+        int sum = first.data + second.data + storage.up;
+        storage.node = insertBefore(storage.node, sum%10);
+        storage.up = sum/10;
         return storage;
     }
 
@@ -272,7 +259,32 @@ class SinglyLinkedListApply2{
     }
 
     // 응용 2.2.2
+    void sumListTotal2(Node first, Node second){
+        if (first == null && second == null) return;
+        int one = totalSum(first);
+        int two = totalSum(second);
+        int sum = one + two;
+        this.header.link = sumListsRev2(sum ,String.valueOf(sum).length());
+    }
 
+    int totalSum(Node node){
+        if (node == null) return 0;
+        Node next = node;
+        int result = 0;
+        while(next != null){
+            result = result*10 + next.data;
+            next = next.link;
+        }
+        return result;
+    }
+
+    Node sumListsRev2(int num, int len){
+        if (len == 0) return null;
+        int ten = (int)Math.pow(10,len-1);
+        Node node = new Node(num/ten);
+        node.link = sumListsRev2(num%ten,--len);
+        return node;
+    }
 
 }
 
@@ -327,6 +339,11 @@ public class Singly_Linked_List_Apply02 {
         list08.sumListTotal(list01.getFirst(),list02.getFirst());
         list08.retrieve();
         list08.retrieveNumRev();
+
+        SinglyLinkedListApply2 list09 = new SinglyLinkedListApply2();
+        list09.sumListTotal2(list01.getFirst(),list02.getFirst());
+        list09.retrieve();
+        list09.retrieveNumRev();
 
     }
 }

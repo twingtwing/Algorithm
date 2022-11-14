@@ -1,4 +1,4 @@
-package Practice.List;
+package practice.list;
 
 class SinglyLinkedList{
 

@@ -1,4 +1,4 @@
-package Practice.List;
+package practice.list;
 
 /**
 * 응용 1. 중복값 제거
