@@ -1,6 +1,9 @@
 package practice.list;
 
+import 엔지니어_대한민국.LinkedList.SinglyLinkedListApply5;
+
 import java.util.Random;
+import java.util.Stack;
 
 /**
  * 응용 1. LinkedList의 노드들이 회문(palindrome)인지를 확인하는 알고리즘
@@ -18,6 +21,14 @@ class SinglyLinkedListApply03{
         
         Node(int data){
             this.data = data;
+        }
+
+        Node get(int len){
+            Node start = link;
+            for(int i = 1; i<len; i++){
+                start = start.link;
+            }
+            return start;
         }
     }
 
@@ -66,6 +77,14 @@ class SinglyLinkedListApply03{
 
     Node getFirst(){return this.header.link;}
 
+    Node getLast(){
+        Node node = this.header.link;
+        while (node != null && node.link != null){
+            node = node.link;
+        }
+        return node;
+    }
+
     boolean isEmpty(){return this.header.link == null;}
 
     // palindrome create
@@ -90,7 +109,7 @@ class SinglyLinkedListApply03{
         return node;
     }
 
-    // 1.palindrome find : 중복값이 없다는 조건
+    // 1.palindrome find
 
     // 1.1 reverse equal
     boolean isPalindromeRev(Node head){
@@ -101,14 +120,13 @@ class SinglyLinkedListApply03{
 
     Node revClone(Node head){
         if (head == null || head.link == null) return head;
-        Node node = head.link;
-        Node result = head;
-        Node start;
-        while (node != null){
-            start = node;
-            start.link = result;
-            result = start;
-            node = node.link;
+        Node result = null;
+        Node prev = null;
+        while (head != null){
+            prev = new Node(head.data);
+            prev.link= result;
+            result = prev;
+            head = head.link;
         }
         return result;
     }
@@ -121,15 +139,107 @@ class SinglyLinkedListApply03{
             clone = clone.link;
         }
         return true;
-     }
-
-
+    }
 
     //응용 1.2 폭이 다른 두 개의 포인터 + stack(선입선출)
+    //폭이 다른 두 개의 포인터로 중앙 위치를 파악할 수 있음
+    //최근에 넣은값을 꺼내야하기 때문에 stack을 사용해야함
+    boolean isCheckPiointer(Node head){
+        if (head == null) return false;
+        if (head.link == null) return true;
+        Node one = head;
+        Node two = head;
+        Stack<Integer> stack = new Stack<>();
+        while (two.link != null && two.link.link != null){
+            stack.push(one.data);
+            one = one.link;
+            two = two.link.link;
+        }
+        stack.push(one.data);
 
-    //응용 1.3 재귀함수
+        if(two.link != null && two.link.link == null){
+            one = one.link;
+        }
 
+        while (one != null){
+            int num =stack.pop();
+            if (one.data != num) return false;
+            one = one.link;
+        }
+        return true;
+    }
 
+    //응용 1.3 중간까지 재귀호출 + 별도의 공간
+    class Storage{
+        Node node; //중간 이후의 노드를 저장
+        boolean result;
+
+        Storage(Node node, boolean result){
+            this.node = node;
+            this.result = result;
+        }
+    }
+
+    boolean isPalindromeSt(Node head){
+        if (head == null) return false;
+        if (head.link == null) return false;
+        int length = getLength(head);
+        Storage storage = isPalindromeRec(head, length);
+        return storage.result;
+    }
+
+    int getLength(Node node){
+        if (node == null) return 0;
+        int count = 0;
+        while (node != null){
+            count ++;
+            node = node.link;
+        }
+        return count;
+    }
+
+    // length를 Node 대신 포인터로 사용하고 이씅ㅁ
+    // 위에서와 마찬가지로 -2를 통해 중간 위치를 유추할 수 있다.
+    Storage isPalindromeRec(Node node, int length){
+        //중간까지만 재귀함수가 감
+        if (length == 0) return new Storage(node,true); //짝수
+        else if (length == 1) return new Storage(node.link,true); //홀수
+
+        Storage storage = isPalindromeRec(node.link, length-2);
+        
+        if (!storage.result || storage.node == null){
+            return storage;
+        }
+        storage.result = (node.data == storage.node.data);
+        storage.node = storage.node.link;
+        return storage;
+    }
+    
+    // 응용 2. 중간에 합쳐지는 교차점 Search : 끝지점이 같기 때문에 끝지점으로 부터 길이를 서로 동일하게 한다.
+    Node getCross(Node one, Node two){
+        if (one == null || two == null) return null;
+        int len01= getLength(one);
+        int len02= getLength(two);
+
+        if (len01 > len02){
+            one = one.get(len01 - len02);
+        }else if(len01 < len02){
+            two = two.get(len02 - len01);
+        }
+
+        Node result = null;
+        while (one != null && two != null){
+            if (one == two) result = one;
+            one = one.link;
+            two = two.link;
+        }
+        return result;
+    }
+
+    // 응용 3.Loop find
+    Node loopFind(Node head){
+        return null;
+    }
 
 }
 
@@ -140,7 +250,11 @@ public class Singly_Linked_List_Apply03 {
         for (int i = 0; i < 4; i++){
             sL.palAppend(new Random().nextInt(10),palStorage);
         }
-        sL.append(3);
+        palStorage.node.link = palStorage.node.link.link;
         sL.retrieve();
+
+        System.out.println("1. 판정 : "+ sL.isPalindromeRev(sL.getFirst()));
+        System.out.println("2. 판정 : "+ sL.isCheckPiointer(sL.getFirst()));
+        System.out.println("3. 판정 : "+ sL.isPalindromeSt(sL.getFirst()));
     }
 }
