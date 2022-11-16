@@ -1,9 +1,10 @@
 package practice.list;
 
-import 엔지니어_대한민국.LinkedList.SinglyLinkedListApply5;
-
 import java.util.Random;
 import java.util.Stack;
+
+import static practice.list.SinglyLinkedListApply03.doubleAppend;
+import static practice.list.SinglyLinkedListApply03.getCross;
 
 /**
  * 응용 1. LinkedList의 노드들이 회문(palindrome)인지를 확인하는 알고리즘
@@ -11,14 +12,14 @@ import java.util.Stack;
  * 응용 3. 루프가 있는 확인하고, 시작되는 지점을 Node를 찾는 알고리즘
  */
 class SinglyLinkedListApply03{
-    
+
     Node header;
-    
+
     static class Node{
         int data;
         Node link;
         Node(){}
-        
+
         Node(int data){
             this.data = data;
         }
@@ -45,6 +46,7 @@ class SinglyLinkedListApply03{
         }
         n.link = end;
     }
+
     void delete(int data){
         Node n = header;
         while(n.link != null){
@@ -57,9 +59,35 @@ class SinglyLinkedListApply03{
         }
     }
 
+    static void doubleAppend(Node one, Node two, int data){
+        Node node = new Node(data);
+        one.link = node;
+        two.link = node;
+    }
+
+    void appendLoop(int data, int position){
+        Node n = header;
+        Node end = new Node(data);
+        end.link = n.get(position);
+        System.out.println(n.get(position).data);
+        while(n.link != null){
+            n = n.link;
+        }
+        n.link = end;
+    }
+
     void retrieve(){
         Node n = header.link;
         while(n.link != null){
+            System.out.print(n.data + "->");
+            n = n.link;
+        }
+        System.out.println(n.data);
+    }
+
+    void retrieveLen(int len){
+        Node n = header.link;
+        for (int i = 0; i < len; i++){
             System.out.print(n.data + "->");
             n = n.link;
         }
@@ -188,7 +216,7 @@ class SinglyLinkedListApply03{
         return storage.result;
     }
 
-    int getLength(Node node){
+    static int getLength(Node node){
         if (node == null) return 0;
         int count = 0;
         while (node != null){
@@ -206,7 +234,7 @@ class SinglyLinkedListApply03{
         else if (length == 1) return new Storage(node.link,true); //홀수
 
         Storage storage = isPalindromeRec(node.link, length-2);
-        
+
         if (!storage.result || storage.node == null){
             return storage;
         }
@@ -214,12 +242,12 @@ class SinglyLinkedListApply03{
         storage.node = storage.node.link;
         return storage;
     }
-    
+
     // 응용 2. 중간에 합쳐지는 교차점 Search : 끝지점이 같기 때문에 끝지점으로 부터 길이를 서로 동일하게 한다.
-    Node getCross(Node one, Node two){
+    static Node getCross(Node one, Node two){
         if (one == null || two == null) return null;
-        int len01= getLength(one);
-        int len02= getLength(two);
+        int len01 = getLength(one);
+        int len02 = getLength(two);
 
         if (len01 > len02){
             one = one.get(len01 - len02);
@@ -229,7 +257,10 @@ class SinglyLinkedListApply03{
 
         Node result = null;
         while (one != null && two != null){
-            if (one == two) result = one;
+            if (one == two) {
+                result = one;
+                break;
+            }
             one = one.link;
             two = two.link;
         }
@@ -237,8 +268,36 @@ class SinglyLinkedListApply03{
     }
 
     // 응용 3.Loop find
+    /**
+     * 직선의 길이 : n / loop의 길이 : m
+     * fast는 slow보다 속도를 2배로 설정한다.
+     * 그러면 둘다 loop를 진입할때는 fast는 loop 시작점부터 n, slow는 loop 시작점에 있게 된다.
+     * 두 포인터가 같은 위치가 만나는 경우는 fast가 slow를 따로 잡을 때다.
+     * 그렇기에 loop를 직선으로 가장하면, fast의 위치는 n, slow의 위치를 m으로 생각할 수있다.
+     * slow - fast = m - n 가 되고, fast가 2(m - n), slow가 m - n을 더 가면 같은 위치에 있게 되고,
+     * 총 길이는 2m-n 이므로 loop의 실제 위치는 (2m -n)%m  = m - n이 된다.
+     * => 여기에서 관점은 loop에 둘다 동시에 들어가는 시점이고,
+     *    그 loop를 직선으로 생각하고, 직선의 길이를 한정하지 않고, 무한대로 생각하여 같은 위치일때
+     *    루프의 길이를 나누었던 나머지 값이 loop의 위치라고 생각하면된다.
+     */
     Node loopFind(Node head){
-        return null;
+        Node fast = head;
+        Node slow = head;
+        while (fast != null && fast.link != null){
+            fast = fast.link.link;
+            slow = slow.link;
+            if (fast == slow) break;
+        }
+
+        // loop가 아니라서 while를 나온 경우
+        if (fast == null || fast.link == null) return null;
+
+        slow = head;
+        while (fast != slow){
+            fast = fast.link;
+            slow = slow.link;
+        }
+        return fast;
     }
 
 }
@@ -256,5 +315,34 @@ public class Singly_Linked_List_Apply03 {
         System.out.println("1. 판정 : "+ sL.isPalindromeRev(sL.getFirst()));
         System.out.println("2. 판정 : "+ sL.isCheckPiointer(sL.getFirst()));
         System.out.println("3. 판정 : "+ sL.isPalindromeSt(sL.getFirst()));
+
+        SinglyLinkedListApply03 sL01 = new SinglyLinkedListApply03();
+        SinglyLinkedListApply03 sL02 = new SinglyLinkedListApply03();
+        for (int i = 0; i < 4; i++){
+            sL01.append(new Random().nextInt(10));
+        }
+
+        for (int i = 0; i < 4; i++){
+            sL02.append(new Random().nextInt(10));
+        }
+
+        for (int i = 0; i < 4; i++){
+            doubleAppend(sL01.getLast(),sL02.getLast(),new Random().nextInt(10));
+        }
+
+        sL01.retrieve();
+        sL02.retrieve();
+
+        System.out.println("교차점 : " + getCross(sL01.getFirst(),sL02.getFirst()).data);
+
+        SinglyLinkedListApply03 sL03 = new SinglyLinkedListApply03();
+        for (int i = 0; i < 9; i++){
+            sL03.append(new Random().nextInt(10));
+        }
+        sL03.appendLoop(new Random().nextInt(10),4);
+        sL03.retrieveLen(11);
+
+        System.out.println("loop 시작점 : " + sL03.loopFind(sL03.getFirst()).data);
     }
+
 }

@@ -137,7 +137,6 @@ public class SinglyLinkedListApply5 {
     private static Node loopFind(Node node){
         Node fast = node;
         Node slow = node;
-        Node result = null;
         while(fast != null && fast.next != null){
             //첫번째 교차는 폭을 다르게
             fast = fast.next.next;
