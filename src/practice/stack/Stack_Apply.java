@@ -1,7 +1,5 @@
 package practice.stack;
 
-import com.sun.org.apache.xpath.internal.objects.XNodeSet;
-
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -94,12 +92,47 @@ class SetOfStacks{
         }
     }
 
-    void pop(int data){
+    int pop(){
         Stacks<Integer> last = getLastStacks();
         if (last == null || last.isEmpty()) throw new EmptyStackException();
-
-
+        int result = last.pop();
+        if (last.isEmpty()) removeStacks();
+        return result;
     }
+
+    int popAt(int stackIndex){
+        if (isEmpty()) throw new EmptyStackException();
+        if (stackIndex >= stacks.size()) throw new IndexOutOfBoundsException();
+        Stacks<Integer> stackNow = this.stacks.get(stackIndex);
+        if (stackNow == null || stackNow.isEmpty()) throw new EmptyStackException();
+        int result = stackNow.pop();
+        shiftLeft(stackIndex);
+        return result;
+    }
+
+    void shiftLeft(int stackIndex) {
+        if (stackIndex >= stacks.size()-1) return;
+        Stacks<Integer> stackNow = this.stacks.get(stackIndex);
+        Stacks<Integer> stackNext = this.stacks.get(stackIndex+1);
+        try {
+            stackNow.push(stackNext.popBottom().data);
+        } catch (FullStackException e) {
+            e.printStackTrace();
+        }
+        if (stackNext.isEmpty()) removeStacks();
+        shiftLeft(stackIndex + 1);
+    }
+
+    void retrive(){
+        if (isEmpty()) return;
+        Stacks<Integer> stack = null;
+        for(int i = 0; i < this.stacks.size(); i++){
+            System.out.print((i+1)+"번째 stack : ");
+            stack = this.stacks.get(i);
+            stack.retrive();
+        }
+    }
+
 }
 
 class Stacks<E>{
@@ -110,7 +143,8 @@ class Stacks<E>{
 
     class Node{
         E data;
-        Node link;
+        Node prev;
+        Node next;
 
         Node(){}
         Node(E data){this.data = data;}
@@ -122,9 +156,11 @@ class Stacks<E>{
         this.top = new Node();
     }
 
-    boolean isEmpty(){return this.top == null;}
+    boolean isEmpty(){return this.top.next == null;}
 
     boolean isFull(){return this.size == this.capacity;}
+
+    int getSize(){return this.size;}
 
     void push(E data) throws FullStackException {
         if (isFull()) throw new FullStackException();
@@ -134,19 +170,54 @@ class Stacks<E>{
     void push(Node node) throws FullStackException {
         if (isFull()) throw new FullStackException();
         if (isEmpty()){
-            top.link = new Node();
-
+            this.bottom = node;
         }else{
-
+            this.top.next.prev = node;
+            node.next = this.top.next;
         }
+        this.top.next = node;
+        node.prev = this.top;
         this.size++;
     }
 
     E pop(){
         if (isEmpty()) throw new EmptyStackException();
-        E result = this.top.link.data;
-        this.top.link = this.top.link.link;
+        E data = this.top.next.data;
+        this.top.next = this.top.next.next;
+        if (isEmpty()) this.bottom = null;
+        else this.top.next.prev = this.top;
+        this.size--;
+        return data;
+    }
+
+    E peek(){
+        if (isEmpty()) throw new EmptyStackException();
+        return this.top.next.data;
+    }
+
+    Node popBottom(){
+        if (isEmpty()) throw new EmptyStackException();
+        Node result = this.bottom;
+        if (this.top.next == result){
+            this.top.next = null;
+            this.bottom = null;
+        }else{
+            this.bottom = this.bottom.prev;
+            this.bottom.next = null;
+        }
+        this.size--;
         return result;
+    }
+
+    void retrive(){
+        if (isEmpty()) return;
+        Node node = this.top.next;
+        while(node.next != null){
+            System.out.print(node.data + " -> ");
+            node = node.next;
+        }
+        System.out.print(node.data);
+        System.out.println();
     }
 
 }
@@ -174,5 +245,26 @@ public class Stack_Apply {
         stack2.push(4);
         System.out.println(stack2.min());
 
+        SetOfStacks sos = new SetOfStacks(3);
+        sos.push(1);
+        sos.push(2);
+        sos.push(3);
+
+        sos.push(4);
+        sos.push(5);
+        sos.push(6);
+
+        sos.push(7);
+        sos.push(8);
+
+        sos.retrive();
+        System.out.println(sos.pop());
+        sos.retrive();
+        System.out.println(sos.popAt(1));
+        sos.retrive();
+        System.out.println(sos.popAt(0));
+        sos.retrive();
+        System.out.println(sos.pop());
+        sos.retrive();
     }
 }
