@@ -3,6 +3,7 @@ package practice.stack;
 import com.sun.org.apache.xpath.internal.objects.XNodeSet;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 /**
@@ -69,7 +70,7 @@ class SetOfStacks{
         stacks = new ArrayList<>();
     }
 
-    boolean isEmpty(){return stacks.size() == 0;}
+    boolean isEmpty(){ return this.stacks.size() == 0;}
 
     Stacks<Integer> getLastStacks(){
         if (isEmpty()) return null;
@@ -80,13 +81,32 @@ class SetOfStacks{
 
     void removeStacks(){stacks.remove(this.stacks.size() - 1);}
 
+    void push(int data){
+        Stacks<Integer> last = getLastStacks();
+        if (last == null || last.isFull()){
+            addStacks();
+            last = getLastStacks();
+        }
+        try {
+            last.push(data);
+        } catch (FullStackException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void pop(int data){
+        Stacks<Integer> last = getLastStacks();
+        if (last == null || last.isEmpty()) throw new EmptyStackException();
 
 
+    }
 }
 
 class Stacks<E>{
+    int size;
     int capacity;
     Node top;
+    Node bottom;
 
     class Node{
         E data;
@@ -97,11 +117,37 @@ class Stacks<E>{
     }
 
     Stacks(int capacity){
+        this.size = 0;
         this.capacity = capacity;
         this.top = new Node();
     }
 
+    boolean isEmpty(){return this.top == null;}
 
+    boolean isFull(){return this.size == this.capacity;}
+
+    void push(E data) throws FullStackException {
+        if (isFull()) throw new FullStackException();
+        push(new Node(data));
+    }
+
+    void push(Node node) throws FullStackException {
+        if (isFull()) throw new FullStackException();
+        if (isEmpty()){
+            top.link = new Node();
+
+        }else{
+
+        }
+        this.size++;
+    }
+
+    E pop(){
+        if (isEmpty()) throw new EmptyStackException();
+        E result = this.top.link.data;
+        this.top.link = this.top.link.link;
+        return result;
+    }
 
 }
 
