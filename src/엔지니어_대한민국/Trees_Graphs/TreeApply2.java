@@ -84,7 +84,7 @@ class Tree3{
     void checkHeight(Node node, Level obj, int level){
         if (node == null){
             if (level < obj.max) obj.min = level;
-            else if(level > obj.max) obj.min = level;
+            else if(level > obj.max) obj.max = level;
             return;
         }
         checkHeight(node.left,obj,level + 1);
