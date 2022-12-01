@@ -22,7 +22,7 @@ class BinarySearchTree{
 
     BinarySearchTree(int len){
         this.root = makeBST(1, len);
-        this.root.right.right.right.right = new Node(11);
+//        this.root.right.right.right.right = new Node(11);
     }
     
     boolean isEmpty(){return this.root == null;}
@@ -124,8 +124,8 @@ class BinarySearchTree{
 
     // 응용 3. level을 저장하는 저장공간을 부여
     class Level{
-        int min = Integer.MIN_VALUE;
-        int max = Integer.MAX_VALUE;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
     }
     
     boolean isBalanced3(Node node){
@@ -135,12 +135,12 @@ class BinarySearchTree{
     }
     
     // 재귀함수의 경우, 나오면서 계산하지만, 이번에는 들어가면서 값을 계산한다. 
-    // 들어가면서 값을 계산해야지 중간에 결과가 나오면 멈출 수 있다.??? 아닌가?
     void countLevel(Node node, Level obj, int level){
         if (node == null){
+            // 항상 새로운 값이 저장되도록 함
             if (level < obj.max) obj.min = level;
             else if(level > obj.max) obj.max = level;
-            return; // 마지막에 도달 하였기 때문에 멈춤
+            return;
         }
         countLevel(node.left,obj,level+1);
         countLevel(node.right,obj,level+1);
@@ -153,6 +153,10 @@ public class Binary_Tree_Apply {
         BinarySearchTree tree = new BinarySearchTree(10);
         tree.printList(tree.levelToList());
         tree.printList(tree.BFSToList());
-        
+
+        System.out.println(tree.isBalanced(tree.root));
+        System.out.println(tree.isBalanced2(tree.root));
+        System.out.println(tree.isBalanced3(tree.root));
+
     }
 }
