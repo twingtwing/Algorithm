@@ -76,7 +76,7 @@ public class TreeApply6 {
 
     //경우의 수를 만들어주는 함수
     static void weaveLists(LinkedList<Integer> first, LinkedList<Integer> second,
-                           ArrayList<LinkedList<Integer>> results, LinkedList<Integer> prefix){
+                            ArrayList<LinkedList<Integer>> results, LinkedList<Integer> prefix){
         // 둘중 하나라도 0이되면, 경우의 수는 1개밖에 남지 않기때문에 재귀호출을 멈춘다.
         if (first.size() == 0 || second.size() == 0){
             LinkedList<Integer> result = new LinkedList<Integer>();
