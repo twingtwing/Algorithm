@@ -79,20 +79,26 @@ class BinaryTree{
     }
     
     // 방법 2. 부모의 자식의 형제 노드를 검색
+    // 형제노드의 하위노드에 해당 노드가 존재한다면, 바로 부모노드가 공동 조상노드인 점을 활용
     Node commonAncestor2(int one, int two){
         Node first = getNode(one);
         Node second = getNode(two);
-        
+
+        // root아래에 없는 경우 미리 제회
         if (coversAncestor(this.root,first) || coversAncestor(this.root,second)) return null;
+        //각 노드가 공통 조상 노드인경우 미리 제회
         else if(coversAncestor(first,second)) return first;
         else if(coversAncestor(second,first)) return second;
         
         Node sibling = getSibling(first);
         Node parent = first.parent;
-        
-        // ??이해 안됨
-        
-        return null;
+
+        while(!coversAncestor(sibling,second)){
+            sibling = getSibling(parent);
+            parent = parent.parent;
+        }
+
+        return parent;
     }
     
     boolean coversAncestor(Node parent, Node child){
@@ -108,17 +114,48 @@ class BinaryTree{
     }
     
     // 방법 3. 부모 link field 가 없는 경우, root 에서부터 시작
+    // root에서 부터 시작해서 서브트리에 존재하는지 확인
     Node commonAncestor3(int one, int two){
         Node first = getNode(one);
         Node second = getNode(two);
-        return null;
+
+        if (!coversAncestor(this.root,first)||!coversAncestor(this.root,second)) return null;
+
+        return subAncestor(this.root, first, second);
+    }
+
+    Node subAncestor(Node root,Node first,Node second){
+        if (root == null || first == null || second == null) return null;
+
+        boolean fristInLeft = coversAncestor(root.left,first);
+        boolean secondInLeft = coversAncestor(root.left,second);
+
+        if (fristInLeft !=  secondInLeft) return root;
+
+        Node parent = fristInLeft ? root.left : root.right;
+        return subAncestor(parent,first,second);
     }
     
-    // 방법 4. postorder
+    // 방법 4. postorder : 자식 노드를 모두 확인하고 나서, 부모 노드를 확인한다.
     Node commonAncestor4(int one, int two){
         Node first = getNode(one);
         Node second = getNode(two);
-        return null;
+        return commonAncestor4(this.root, first, second);
+    }
+
+    Node commonAncestor4(Node root, Node first, Node second){
+        if (root == null || first == null || second == null) return null;
+
+        Node left = commonAncestor4(root.left,first,second);
+        if (left != null && left != first && left != second) return left;
+
+        Node right = commonAncestor4(root.right,first,second);
+        if (right != null && right != first && right != second) return right;
+
+        if (left != null && right != null) return root;
+        else if(root == left || root == right) return root;
+
+        return left == null ? right : left;
     }
     
     // 방법 5. 찾음 유무를 객체로 저장하여 해당 포인터로 반환
