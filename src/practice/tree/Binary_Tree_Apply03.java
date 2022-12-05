@@ -1,6 +1,5 @@
 package practice.tree;
 
-import javax.swing.undo.CannotUndoException;
 import java.util.HashMap;
 
 /**
@@ -14,7 +13,7 @@ import java.util.HashMap;
 class BinaryTree{
 
     Node root;
-    HashMap<Integer, Node> nodeHashMap = new HashMap<>();
+    HashMap<Integer, Node> nodeHashMap;
 
     class Node{
         int data;
@@ -25,16 +24,19 @@ class BinaryTree{
         Node(int data){this.data = data;}
     }
 
-    BinaryTree(int size){this.root = makeBST(1,size-1,null);}
+    BinaryTree(int size){
+        this.nodeHashMap = new HashMap<>();
+        this.root = makeBST(1,size-1,null);
+    }
 
     Node makeBST(int s, int e,Node parent) {
-        if (s < e) return null;
+        if (s > e) return null;
         int m = (s+e)/2;
         Node node = new Node(m);
         node.left = makeBST(s,m-1,node);
         node.right = makeBST(m+1,e,node);
         node.parent = parent;
-        nodeHashMap.put(m,node);
+        this.nodeHashMap.put(m,node);
         return node;
     }
 
@@ -46,8 +48,8 @@ class BinaryTree{
         Node first = getNode(one);
         Node second = getNode(two);
         int diff = getLevel(first) - getLevel(second);
-        if (diff > 0) second = getUpDiff(second,diff);
-        else if(diff < 0) first = getUpDiff(first,-diff);
+        if (diff > 0) first = getUpDiff(first,diff);
+        else if(diff < 0) second = getUpDiff(second,-diff);
         return findParent(first,second);
     }
 
@@ -62,7 +64,7 @@ class BinaryTree{
     }
 
     Node getUpDiff(Node node, int diff){ // 같은 level dp
-        while(diff > 0){
+        while(diff > 0 && node != null){
             node = node.parent;
             diff --;
         }
@@ -75,7 +77,7 @@ class BinaryTree{
             first = first.parent;
             second = second.parent;
         }
-        return first;
+        return first == null || second == null ? null : first;
     }
     
     // 방법 2. 부모의 자식의 형제 노드를 검색
@@ -85,7 +87,7 @@ class BinaryTree{
         Node second = getNode(two);
 
         // root아래에 없는 경우 미리 제회
-        if (coversAncestor(this.root,first) || coversAncestor(this.root,second)) return null;
+        if (!coversAncestor(this.root,first) || !coversAncestor(this.root,second)) return null;
         //각 노드가 공통 조상 노드인경우 미리 제회
         else if(coversAncestor(first,second)) return first;
         else if(coversAncestor(second,first)) return second;
@@ -137,6 +139,7 @@ class BinaryTree{
     }
     
     // 방법 4. postorder : 자식 노드를 모두 확인하고 나서, 부모 노드를 확인한다.
+    // 아직도 이해안됨,,,,
     Node commonAncestor4(int one, int two){
         Node first = getNode(one);
         Node second = getNode(two);
@@ -144,33 +147,79 @@ class BinaryTree{
     }
 
     Node commonAncestor4(Node root, Node first, Node second){
-        if (root == null || first == null || second == null) return null;
+        if (root == null) return null;
+        if (root == first && root == second) return root;
 
         Node left = commonAncestor4(root.left,first,second);
+        // 왼쪽 끝까지 갈때까지 해당 노드를 못 찾으면, 계속 왼쪽 서브트리를 찾음
         if (left != null && left != first && left != second) return left;
 
         Node right = commonAncestor4(root.right,first,second);
+        // 오른쪽 끝까지 갈때까지 해당 노드를 못 찾으면, 계속 오른쪽 서브트리를 찾음
         if (right != null && right != first && right != second) return right;
 
-        if (left != null && right != null) return root;
-        else if(root == left || root == right) return root;
+        // null이거나 값을 찾아서 내려옴
+        // => 둘다 null이 아니거나 둘 중 하나가 root이면 root 출력
+        if ((left != null && right != null) ||
+                (root == first || root == second)) return root;
 
+        // 둘 중 하나가 null 이면, null이 아닌 값을 출력
         return left == null ? right : left;
     }
     
-    // 방법 5. 찾음 유무를 객체로 저장하여 해당 포인터로 반환
+    // 방법 5. postorder + pointer
+    // 찾음 유무를 객체로 저장하여 해당 포인터로 반환
+    // => 아직 이해 안됨
+    class Result{
+        Node node;
+        boolean isAncester;
+        
+        Result(Node node, boolean isAncester){
+            this.node = node;
+            this.isAncester = isAncester;
+        }
+    }
+    
     Node commonAncestor5(int one, int two){
         Node first = getNode(one);
         Node second = getNode(two);
-        return null;
+        
+        Result result = commonAncestor5(this.root, first, second);
+        
+        return result.isAncester ? result.node : null;
     }
     
+    Result commonAncestor5(Node root, Node first, Node second){
+        if (root == null) return new Result(null, false);
+        if (root == first && root == second) return new Result(root, true);
+        
+        // 왼쪽에 찾을때까지 이동
+        Result left = commonAncestor5(root.left, first, second);
+        if (left.isAncester) return left;
+        
+        // 오른쪽 까지 찾을때까지 이동
+        Result right = commonAncestor5(root.right, first, second);
+        if (right.isAncester) return right;
+        
+        if(left.node != null && right.node != null) 
+            return new Result(root, true);
+        else if(root == first || root == second)
+            return new Result(root, left.node != null || right.node != null);
+        
+        return new Result(left.node != null ? left.node : right.node, false);
+    }
     
 
 }
 
 public class Binary_Tree_Apply03 {
     public static void main(String[] args) {
+        BinaryTree tree = new BinaryTree(10);
+        System.out.println(tree.commonAncestor(2,9).data);
+        System.out.println(tree.commonAncestor2(2,9).data);
+        System.out.println(tree.commonAncestor3(2,9).data);
+        System.out.println(tree.commonAncestor4(2,9).data);
+        System.out.println(tree.commonAncestor5(2,9).data);
 
     }
 }
