@@ -162,7 +162,6 @@ public class Binary_Tree_Apply04 {
         }
 
         System.out.println();
-
         BinarySearch tree1 = new BinarySearch();
         BinarySearch tree2 = new BinarySearch();
         tree1.root = tree1.makeBST(0,9);
