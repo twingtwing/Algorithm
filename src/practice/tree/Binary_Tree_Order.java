@@ -1,21 +1,15 @@
 package practice.tree;
 
 /**
- *  Inorder/Preorder/Postorder 방식으로 Tree를 구현
- *  => 1개를 가지고 경우의 수가 많기 때문에, 2개를 동시에 가지고 추측하여 Tree를 구현한다.
- *  - Preorder + Inorder : preorder은 맨앞이 root이고, Inorder은 중간쯤에 root가 있음
- *                         Inorder에서 root를 찾으면 양쪽은 서브트리가 된다. 다시 preorder의 2번째는 왼쪽 서브트리의 root가 된다.
- *                         그러면 다시 Inorder의 왼쪽의 서브트리의 다시 양쪽 서브 트리를 구현이 가능하다.
- *                         이런 방식을 반복하면, 구현이 가능하다.
- *  - Postorder + Inorder : 위에와 마찬가지이지만, 반대로 postorder은 맨 뒤가 root이다.  두번째는 오른쪽 노드의 root가된다.
- *                          이런 방식을 반ㅈ복하면 구현이 가능하다.
- *                          단, 다른점은 preorder에서 배열을 역순으로 하기 때문에 왼 -> 오 -> 중앙 으로 재귀호출 하지 않고,
- *                          중앙 -> 오 -> 왼 으로 재귀호출을 한다.
- *  - Preorder + Postorder : pre와 post는 구현이 가능하지만, 만약 full 이진트리가 아니고, 밸런스가 나쁘다면, 구현이 힘들다
+ * LinearList로 구현된 Tree를 순회를 통해 LinkedList로 구현
+ * => 1개를 가지고 경우의 수가 많아지기 때문에 2개의 순회를 동시 사용하여 Tree를 구현
+ * => 두개의 순회를 통해 서브트리의 root를 찾아 Tree를 구현한다.
+ * => Preorder + Postorder은 구현이 가능하지만, full 이진트리가 아니고, 밸런스가 좋지 않으면 구현이 힘들다
  */
 class BinaryTreeOrder{
 
     Node root;
+    int index = 0; // 배열 index
 
     class Node{
         int data;
@@ -24,10 +18,69 @@ class BinaryTreeOrder{
         Node(int data){this.data = data;}
     }
 
+    // 1. Preorder  +  Inorder
+    public void buildTreeByPreIn(int [] in, int [] pre){
+        this.index = 0; // 이때는 preorder의 index
+        this.root = buildTreeByPreIn(in,pre,0,in.length-1);
+    }
+
+    private Node buildTreeByPreIn(int[] in, int[] pre, int inStart, int inEnd) {
+        if (inStart > inEnd) return null;
+        Node node = new Node(pre[index++]);
+        int inMid = searchIndex(node.data, in, inStart, inEnd);
+        node.left = buildTreeByPreIn(in, pre, inStart, inMid-1);
+        node.right = buildTreeByPreIn(in, pre, inMid + 1, inEnd);
+        return node;
+    }
+
+    // 2. Postorder + Inorder
+    public void buildTreeByPostIn(int [] in,  int [] post){
+        this.index = post.length -1;
+        this.root = buildTreeByPostIn(in, post, 0, in.length - 1);
+    }
+
+    private Node buildTreeByPostIn(int[] in, int[] post, int inStart, int inEnd) {
+        if (inStart > inEnd) return null;
+        Node node = new Node(post[index--]);
+        int inMid = searchIndex(node.data, in, inStart, inEnd);
+
+        // Postorder이기때문에 right 먼저 해야함
+        node.right = buildTreeByPostIn(in, post, inMid + 1, inEnd);
+        node.left = buildTreeByPostIn(in, post, inStart, inMid - 1);
+        return node;
+    }
+
+    private int searchIndex(int data, int[] in, int inStart, int inEnd) {
+        for (int i = inStart; i <= inEnd; i++) if (in[i] == data) return i;
+        return Integer.MIN_VALUE;
+    }
+
+    // 출력
+    public void printInOrder(){printInOrder(this.root);}
+
+    private void printInOrder(Node node) {
+        if (node == null) return;
+        printInOrder(node.left);
+        System.out.print(node.data + " ");
+        printInOrder(node.right);
+    }
+
 }
 
 public class Binary_Tree_Order {
     public static void main(String[] args) {
+        BinaryTreeOrder tree = new BinaryTreeOrder();
+        int [] pre = {4,2,1,3,6,5,7};
+        int [] in = {1,2,3,4,5,6,7};
+        int [] post = {1,3,2,5,7,6,4};
+
+        tree.buildTreeByPreIn(in,pre);
+        tree.printInOrder();
+        System.out.println();
+
+        tree.buildTreeByPostIn(in,post);
+        tree.printInOrder();
+        System.out.println();
 
     }
 }

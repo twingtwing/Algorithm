@@ -1,6 +1,7 @@
 package practice.tree;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -134,16 +135,107 @@ class BinarySearch{
         return matchTree(first.left,second.left) && matchTree(first.right,second.right);
     }
 
+    // 응용 3. preorder => 위에서 아래롤 내려가야 하기 때문에
 
-    // 응용 3. preorder
+    // 3.1 모든 노드마다 방법을 찾음 => 중복 순회가 발생
+    // 시간 복잡도 : O(nlogn) ~  O(n^2)
+    int countPath(int targetSum){return countPath(this.root,targetSum);}
 
-    // 3.1 모든 노드마다 방법을 찾음 => 중복 순회
+    // 시작점을 어디로 할지를 정하는 순회
+    private int countPath(Node node, int targetSum) {
+        if (node == null) return 0;
+        int pathFromNow = countPathWithSum(node,targetSum,0);
 
-    // 3.2 저장곤간을 이용 => 중복 순회 방지
+        // 경로의 시작점이 무조건 root 필요가 없기 때문에 전체 노드를 모두 순회하여야한다.
+        int pathFromLeft = countPath(node.left,targetSum);
+        int pathFromRight = countPath(node.right,targetSum);
 
-    // 3.3 노드간의 배열간 거리 설정해서 값 추가
+        return pathFromNow + pathFromLeft + pathFromRight;
+    }
 
+    // 시작점을 기준으로 경로를 구하는 순회
+    private int countPathWithSum(Node node, int targetSum, int curSum) {
+        if (node == null) return 0;
+        int totalPath = 0;
 
+        curSum += node.data;
+        if (curSum == targetSum) totalPath++;
+
+        totalPath += countPathWithSum(node.left,targetSum,curSum);
+        totalPath += countPathWithSum(node.right,targetSum,curSum);
+
+        return totalPath;
+    }
+
+    // 3.2 추가 저장공간을 이용 => 중복 순회 방지
+    // 시간복잡도 : O(n*배열.length)
+    int countPath2(int targetSum){return countPath2(this.root,targetSum, new ArrayList<>());}
+
+    // 시작점을 구하는 순회 => n
+    private int countPath2(Node node, int targetSum, ArrayList<Integer> sumAry) {
+        if(node == null) return 0;
+        int totalPath = 0;
+        addLast(sumAry,node.data); // 현재 시작점을 추가
+        totalPath += countPathWithAry(sumAry,targetSum); // 지금 시점까지의 경로를 구한다.
+        totalPath += countPath2(node.left, targetSum, sumAry);
+        totalPath += countPath2(node.right, targetSum, sumAry);
+        removeLast(sumAry); // 현재 시작점을 삭제
+        return totalPath;
+    }
+
+    // 시작점을 기준으로 경로를 구하기 위해 배열을 순회 => Array.size()
+    // 이때 각 배열방은 시작점을 의미하고, 값은 시작점을 기준으로 현재 지점까지의 합을 의미한다.
+    private int countPathWithAry(ArrayList<Integer> sumAry, int targetSum) {
+        if (sumAry.isEmpty()) return 0;
+        int totalPath = 0;
+        for (Integer integer : sumAry) if (targetSum == integer) totalPath++;
+        return totalPath;
+    }
+
+    // 모든 시작점에 값을더하고, 시작점을 추가한다.
+    private void addLast(ArrayList<Integer> sumAry, int data) {
+        for (int i = 0; i < sumAry.size(); i++) sumAry.set(i,sumAry.get(i) + data);
+        sumAry.add(data);
+    }
+
+    // 모든 시작점에 값을 빼고, 시작점을 삭제한다.
+    private void removeLast(ArrayList<Integer> sumAry) {
+        int data = sumAry.remove(sumAry.size()-1);
+        for (int i = 0; i < sumAry.size(); i++) sumAry.set(i,sumAry.get(i) - data);
+    }
+
+    // 3.3 노드간의 거리 HashMap에 저장 (배열 대신 HashMap)
+    // 배열과는 달리 시작점에서의 현재 노드까지의 합산이 아닌 root에서부터 시작점까지의 합산을 저장한다.
+    // (root-현재지점  = root-시작점 + 구하고자하는 값)을 이용해서 시작점 갯수를 구함으로써 경로를 구한다.
+    int countPath3(int targetSum){
+        HashMap<Integer,Integer> hashTable = new HashMap<>();
+        hashTable.put(0,1);
+        return countPath3(this.root,targetSum,0,hashTable);
+    }
+
+    private int countPath3(Node node, int targetSum, int curSum, HashMap<Integer,Integer> hashTable){
+        if(node == null) return 0;
+        curSum += node.data;
+
+        // root 부터 현재 노드까지의 합산에서 원하는 값을 뺀값과 root부터의 합산이 같은 시작점을 찾으면 된다.
+        int minus = curSum - targetSum;
+        int totalPath = hashTable.getOrDefault(minus, 0);
+
+        increHashTable(hashTable, curSum, 1);
+        totalPath += countPath3(node.left, targetSum, curSum, hashTable);
+        totalPath += countPath3(node.right, targetSum, curSum, hashTable);
+        increHashTable(hashTable, curSum, -1);
+
+        return totalPath;
+    }
+
+    // key  : root 부터 현재 지점까지의 합산
+    // value : 값은 key을 가진 시작점 갯수
+    void increHashTable(HashMap<Integer,Integer> hashTable, int key, int val){
+        int newCount = hashTable.getOrDefault(key,0) + val;
+        if (newCount == 0) hashTable.remove(key);
+        else hashTable.put(key,newCount);
+    }
 }
 
 public class Binary_Tree_Apply04 {
@@ -173,6 +265,11 @@ public class Binary_Tree_Apply04 {
         tree3.root = tree3.makeBST(7,9);
 
         System.out.println(tree1.containsTree(tree1.root,tree3.root));
+
+        BinarySearch tree4 = new BinarySearch(10);
+        System.out.println(tree4.countPath(3));
+        System.out.println(tree4.countPath2(3));
+        System.out.println(tree4.countPath3(3));
 
     }
 
