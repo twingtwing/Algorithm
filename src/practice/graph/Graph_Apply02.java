@@ -1,7 +1,5 @@
 package practice.graph;
 
-import com.sun.org.apache.xpath.internal.operations.String;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -15,21 +13,22 @@ class Project{
     private String name;
     private boolean marked;
     private LinkedList<Project> dependencies;
+    
     public Project(String name){
         this.name = name;
         this.marked = false;
         this.dependencies = new LinkedList<>();
     }
     
-    public String getName() {return name;}
+    public String getName() {return this.name;}
 
-    public boolean isMarked() {return marked;}
+    public boolean isMarked() {return this.marked;}
 
     public void setMarked(boolean marked) {this.marked = marked;}
 
-    public LinkedList<Project> getDependencies() {return dependencies;}
+    public LinkedList<Project> getDependencies() {return this.dependencies;}
     
-    public void addDependencies(Project project){if (this.dependencies.contains(project)) this.dependencies.add(project);}
+    public void addDependencies(Project project){if (!this.dependencies.contains(project)) this.dependencies.add(project);}
 
 }
 
@@ -43,16 +42,54 @@ class ProjectManager{
         addDependencies(dependencies);
     }
 
-    private void addDependencies(String[][] dependencies) {
+    private void buildProjects(String[] names) {
+        this.projects = new HashMap<>();
+        for (String name : names){
+            this.projects.put(name,new Project(name));
+        }
     }
 
-    private void buildProjects(String[] names) {
+    private void addDependencies(String[][] dependencies) { // name 배열 ( 자식 project, 부모 project)
+        for (String [] dependency : dependencies){
+            Project root = findProject(dependency[0]);
+            Project child = findProject(dependency[1]);
+            child.addDependencies(root);
+        }
+    }
+
+    private Project findProject(String name) {return this.projects.get(name);}
+    
+    Integer index;
+    public Project[] buildOrder(){
+        setInitMarked();
+        this.index = 0;
+        Project [] path = new Project[this.projects.size()];
+        for (Project project : this.projects.values()) buildOrder(project,path);
+        return path;
+    }
+
+    private void buildOrder(Project project, Project[] path) {
+        if (project.isMarked()) return;
+        if (!project.getDependencies().isEmpty())for (Project root : project.getDependencies()) buildOrder(root,path);
+        project.setMarked(true);
+        path[index++] = project;
+    }
+
+    private void setInitMarked() {for (Project project : this.projects.values())project.setMarked(false);}
+    
+    public void printPath(Project [] path){
+        if (path.length == 0) return;
+        for (Project project : path) if (project != null) System.out.print(project.getName() + " ");
     }
 }
 
 
 public class Graph_Apply02 {
     public static void main(String[] args) {
-
+        String [] projects ={"a","b","c","d","e","f","g"};
+        String [][] dependencies = {{"f","a"},{"f","b"},{"f","c"},{"b","a"},{"c","a"},{"a","e"},{"b","e"},{"d","g"}};
+        ProjectManager pm = new ProjectManager(projects,dependencies);
+        pm.printPath(pm.buildOrder());
     }
+
 }
