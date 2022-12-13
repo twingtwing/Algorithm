@@ -18,7 +18,9 @@ class HashT{
         }
     }
 
-    LinkedList<Node>[] data; // collison을 방지하기 위해, 배열방에 바로 저장하지 않고, 배열방 안에 linkedlist를 선언하여 linkedlist에 먼저 저장한다.
+    LinkedList<Node>[] data;
+    // collison을 방지하기 위해, 배열방에 바로 저장하지 않고,
+    // 배열방 안에 linkedlist를 선언하여 linkedlist에 먼저 저장한다.
 
     HashT(int size){
         this.data = new LinkedList[size];

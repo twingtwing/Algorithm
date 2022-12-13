@@ -1,4 +1,4 @@
-package practice.array;
+package practice.list;
 
 class ArrayListBasic {
     private int size;
