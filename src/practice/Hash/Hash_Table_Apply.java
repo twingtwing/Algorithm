@@ -22,10 +22,11 @@ class HashTableApply {
     }
 
     // 2. HashTable을 사용하지만, 값을 넣으면서 순회함
+    // 동시에 넣는 게 아니고 순차적으로 넣는거기 때문에 윗처럼 결과를 찾을 수 있다.
     public int[] twoSumWithHash2(int[] nums, int target) {
         HashMap<Integer,Integer> hashMap = new HashMap<>();
         for (int i = 0; i < nums.length; i++) { //...? 반만 검색 되지 않나,,,?
-            if (hashMap.containsKey(target - nums[i])) return new int[] {i,hashMap.get(target - nums[i])};
+            if (hashMap.containsKey(target - nums[i])) return new int[] {hashMap.get(target - nums[i]),i};
             hashMap.put(nums[i],i);
         }
         throw new IllegalArgumentException();

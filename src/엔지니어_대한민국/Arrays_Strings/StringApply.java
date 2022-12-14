@@ -61,7 +61,7 @@ public class StringApply {
     private static boolean isUnique3(String str){
         int checker = 0;
         for (int i =0; i< str.length(); i++){
-            int val = str.charAt(i ) - 'a'; // int로 자동변환되면 97이 마이너스됨
+            int val = str.charAt(i) - 'a'; // int로 자동변환되면 97이 마이너스됨
             if((checker & (i << val)) > 0){ //i를 해당 val만큼 쉬프트하고, 해당값이 checker에 있느지 비트연산자로 확인
                 return false;
             }
