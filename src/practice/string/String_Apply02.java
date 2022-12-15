@@ -43,6 +43,16 @@ public class String_Apply02 {
             shrotStr = one;
         }
 
+        boolean flag = false;
+        // 편집기능이 2회 이상 발생하였는지 확인
+        for (int i = 0, j = 0; i < shrotStr.length(); i++, j++) {
+            if (shrotStr.charAt(i) != longStr.charAt(j)) {
+                if (flag) return false;
+                if (shrotStr.length() != longStr.length()) j++; //추가 + 삭제 기능이 발생한 위치이므로 건너뜀
+                flag = true;
+            }
+        }
+
         return true;
     }
 
@@ -50,10 +60,26 @@ public class String_Apply02 {
     //    포함 여부는 contains()할수를 통해 알아냄
     private static boolean isRotation(String one, String two){
         if (one.length() != two.length()) return false;
-        return false;
+        return (one + one).contains(two);
     }
 
     public static void main(String[] args) {
         System.out.println(URLify("Mr John Smith    ",13));
+
+        System.out.println(isOneWay("pal","pale"));
+        System.out.println(isOneWay("pale","ple"));
+        System.out.println(isOneWay("bale","pale"));
+
+        System.out.println();
+
+        System.out.println(isOneWay("pa","pale"));
+        System.out.println(isOneWay("pale","pe"));
+        System.out.println(isOneWay("babe","pale"));
+
+        System.out.println(isRotation("string","trings"));
+        System.out.println(isRotation("string","ringst"));
+        System.out.println(isRotation("string","ingstr"));
+        System.out.println(isRotation("string","ngstri"));
+        System.out.println(isRotation("string","gstrni"));
     }
 }
