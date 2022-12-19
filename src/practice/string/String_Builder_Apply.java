@@ -7,6 +7,7 @@ package practice.string;
  * => StringBuilder은 값을 수정하는 과정에서는 효율적이지만,
  *    공간 부족시에  Doubling작업을하기 때문에 비효율적이다.
  * => StringBuilder하는 동시에 문자열의 길이를 사전에 미리 전달하면,
+ *
  *    공간부족을 줄이기 때문에 Doubling작업의 비효율을 줄일 수 있다.
  */
 
