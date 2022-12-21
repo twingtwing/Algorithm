@@ -28,7 +28,6 @@ class BigO{
     // 이진검색트리가 아닌 이진트리에서 특정한 값을 찾아야하는 경우의 시간 복잡도 => O(n) 모든 노드를 전부 순회해야함
 
     // 시간복잡도 : O(n^2)
-    // O(nlogn) 이 아니다...왜지?
     public int[] bigOQuestion3(int[] ary, int val){
         int[] bigger = new int[ary.length + 1]; //사이즈 1 증가
         for (int i =0; i <ary.length; i++){
